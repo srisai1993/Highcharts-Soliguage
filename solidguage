@@ -1,4 +1,4 @@
- chartOptions: Highcharts.Options = {
+chartOptions: Highcharts.Options = {
     chart: {
       type: 'solidgauge',
       height: 400,
@@ -77,9 +77,9 @@
     const kpiData = [
       { kpi: 'Jiras worked on', value: 22, maxValue: 100 },
       { kpi: 'Average Daily Commits', value: 14, maxValue: 85 },
-      { kpi: 'PRs Submitted', value: 7, maxValue: 12 },
-      { kpi: 'PRs Reviewed', value: 5, maxValue: 10 },
-      { kpi: 'Net Quality Issues Resolved', value: 52, maxValue: 52 },
+      { kpi: 'PRs Submitted', value: 50, maxValue: 100 },
+      { kpi: 'PRs Reviewed', value: 5, maxValue: 100 },
+      { kpi: 'Net Quality Issues Resolved', value: 7, maxValue: 100 },
     ];
 
     const arcThickness = 12;
@@ -121,6 +121,7 @@
         ],
         dataLabels: {
           enabled: true,
+          format: '{y}%',
           borderWidth: 0,
           useHTML: false,
           style: {
