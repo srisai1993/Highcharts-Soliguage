@@ -1,0 +1,309 @@
+import { Component } from '@angular/core';
+import * as Highcharts from 'highcharts';
+import HighchartsMore from 'highcharts/highcharts-more.src';
+import HighchartsSolidGauge from 'highcharts/modules/solid-gauge';
+
+HighchartsMore(Highcharts);
+HighchartsSolidGauge(Highcharts);
+
+@Component({
+  selector: 'my-app',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  Highcharts = Highcharts;
+  updateFlag = false;
+
+  chartOptions: Highcharts.Options = {
+    chart: {
+      type: 'solidgauge',
+      height: 300
+    },
+    
+    title: {
+      text: null // ✅ Removed title for more space
+    },
+    credits: {
+      enabled: false // ✅ Removed Highcharts credits
+    },
+    tooltip: {
+      enabled: true,
+      borderWidth: 0,
+      backgroundColor: 'none',
+      shadow: false,
+      style: {
+        fontSize: '16px'
+      },
+      valueSuffix: '%',
+      pointFormat:
+        '{series.name}<br><span style="font-size:2em; color: {point.color}; font-weight: bold">{point.y}</span>',
+      positioner: function (labelWidth) {
+        return {
+          x: (this.chart.chartWidth - labelWidth) / 2 -50,
+          y: this.chart.plotHeight * 0.5  // ✅ Move tooltip slightly up
+        };
+      }
+    },
+    legend: {
+      enabled: true, // ✅ Show legend
+      layout: 'vertical',
+      align: 'right',
+      verticalAlign: 'top',
+      x: 0,
+      y: 0,
+      itemStyle: {
+        fontWeight: 'bold',
+        fontSize: '14px'
+      }
+    },
+    pane: {
+      startAngle: -90,
+      endAngle: 90,
+      center: ['50%', '65%'], // ✅ Center adjusted for even arc
+      size: '100%',
+      background: [
+        {
+          outerRadius: '100%',
+          innerRadius: '80%',
+          shape: 'arc',
+          backgroundColor: Highcharts.color(Highcharts.getOptions().colors![0]).setOpacity(0.3).get(),
+          borderWidth: 0
+        },
+        {
+          outerRadius: '79%',
+          innerRadius: '60%',
+          shape: 'arc',
+          backgroundColor: Highcharts.color(Highcharts.getOptions().colors![1]).setOpacity(0.3).get(),
+          borderWidth: 0
+        },
+        {
+          outerRadius: '59%',
+          innerRadius: '40%',
+          shape: 'arc',
+          backgroundColor: Highcharts.color(Highcharts.getOptions().colors![2]).setOpacity(0.3).get(),
+          borderWidth: 0
+        }
+      ]
+    },
+    yAxis: {
+      min: 0,
+      max: 100,
+      lineWidth: 0,
+      tickPositions: []
+    },
+    plotOptions: {
+      solidgauge: {
+        rounded: false, // ✅ Flat ends for even arc
+        dataLabels: {
+          enabled: false,
+          y: -30,
+          borderWidth: 0,
+          useHTML: true
+        }
+      }
+    },
+    series: []
+  };
+
+  ngOnInit(): void {
+    this.loadBidChartData();
+  }
+
+  loadBidChartData(): void {
+    const kpiData = [
+      { kpi: 'Move', value: 80, maxValue: 100 },
+      { kpi: 'Exercise', value: 65, maxValue: 100 },
+      { kpi: 'Stand', value: 50, maxValue: 100 },
+      { kpi: 'Focus', value: 40, maxValue: 100 },
+      { kpi: 'Energy', value: 30, maxValue: 100 }
+    ];
+  
+    const arcThickness = 12;     // thickness of each arc
+    const arcSpacing = 0;        // ❌ No gap between arcs
+    const startOuterRadius = 95; // ⬅️ start arcs inward to allow center space
+  
+    const series: Highcharts.SeriesSolidgaugeOptions[] = [];
+    const background: any[] = [];
+  
+    kpiData.forEach((kpi, index) => {
+      const color = Highcharts.getOptions().colors![index % Highcharts.getOptions().colors!.length];
+  
+      const outerRadius = startOuterRadius - index * (arcThickness + arcSpacing);
+      const innerRadius = outerRadius - arcThickness;
+  
+      background.push({
+        outerRadius: `${outerRadius}%`,
+        innerRadius: `${innerRadius}%`,
+        shape: 'arc',
+        backgroundColor: Highcharts.color(color).setOpacity(0.3).get(),
+        borderWidth: 0
+      });
+  
+      series.push({
+        name: kpi.kpi,
+        type: 'solidgauge',
+        showInLegend: true,
+        color: color,
+        data: [
+          {
+            y: (kpi.value / kpi.maxValue) * 100,
+            radius: `${outerRadius}%`,
+            innerRadius: `${innerRadius}%`,
+            color: color
+          }
+        ],
+        dataLabels: {
+          enabled: true,
+          format: '{y}%',
+          borderWidth: 0,
+          useHTML: false,
+          style: {
+            fontSize: '13px',
+            fontWeight: 'bold',
+            color: '#fff',
+            textOutline: 'none',
+          },
+          align: 'center',
+          verticalAlign: 'middle',
+          y: -((outerRadius + innerRadius) / 2 - 50) // position text at arc center
+        }
+      });
+    });
+  
+    if (this.chartOptions.pane) {
+      this.chartOptions.pane.background = background;
+    }
+  
+    this.chartOptions.series = series;
+    this.updateFlag = true;
+  }
+  
+  
+ 
+  
+  // loadBidChartData(): void {
+  //   const kpiData = [
+  //     { kpi: 'Move', value: 80, maxValue: 100 },
+  //     { kpi: 'Exercise', value: 65, maxValue: 100 },
+  //     { kpi: 'Stand', value: 50, maxValue: 100 },
+  //     { kpi: 'Focus', value: 40, maxValue: 100 },
+  //     { kpi: 'Energy', value: 30, maxValue: 100 }
+  //   ];
+  
+  //   const maxArcs = 5;
+  //   const arcThickness = 15;  // each arc is 15%
+  //   const arcSpacing = 3;     // 3% gap between arcs
+  
+  //   const totalThickness = kpiData.length * (arcThickness + arcSpacing);
+  //   const startOuterRadius = 100; // start from outermost edge
+  //   const series: Highcharts.SeriesSolidgaugeOptions[] = [];
+  //   const background: any[] = [];
+  
+  //   kpiData.forEach((kpi, index) => {
+  //     const color = Highcharts.getOptions().colors![index % Highcharts.getOptions().colors!.length];
+  
+  //     const outerRadius = startOuterRadius - index * (arcThickness + arcSpacing);
+  //     const innerRadius = outerRadius - arcThickness;
+  
+  //     // Background arc
+  //     background.push({
+  //       outerRadius: `${outerRadius}%`,
+  //       innerRadius: `${innerRadius}%`,
+  //       shape: 'arc',
+  //       backgroundColor: Highcharts.color(color).setOpacity(0.3).get(),
+  //       borderWidth: 0
+  //     });
+  
+  //     // Data arc
+  //     series.push({
+  //       name: kpi.kpi,
+  //       type: 'solidgauge',
+  //       showInLegend: true,
+  //       color: color,
+  //       data: [
+  //         {
+  //           y: (kpi.value / kpi.maxValue) * 100, // normalize to 100
+  //           radius: `${outerRadius}%`,
+  //           innerRadius: `${innerRadius}%`,
+  //           color: color
+  //         }
+  //       ],
+  //       dataLabels: {
+  //         enabled: false,
+  //         useHTML: false,
+  //         format: '{y}%',
+  //         borderWidth: 0,
+  //         style: {
+  //           fontSize: '14px',
+  //           fontWeight: 'bold',
+  //           color: '#fff',
+  //           textOutline: 'none'
+  //         },
+  //         align: 'center',
+  //         verticalAlign: 'middle',
+  //         x: 40 - index * 8, // slightly offset labels
+  //         y: 0
+  //       }
+  //     });
+  //   });
+  
+  //   // Apply updated arcs to chart config
+  //   if (this.chartOptions.pane) {
+  //     this.chartOptions.pane.background = background;
+  //   }
+  
+  //   this.chartOptions.series = series;
+  //   this.updateFlag = true;
+  // }
+  
+  
+  // loadBidChartData(): void {
+  //   this.chartOptions.series = [
+  //     {
+  //       name: 'Move',
+  //       type: 'solidgauge',
+  //       showInLegend: true,
+  //       color: Highcharts.getOptions().colors![0],
+  //       data: [
+  //         {
+  //           color: Highcharts.getOptions().colors![0],
+  //           radius: '100%',
+  //           innerRadius: '80%',
+  //           y: 80
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       name: 'Exercise',
+  //       type: 'solidgauge',
+  //       showInLegend: true,
+  //       color: Highcharts.getOptions().colors![1],  // <-- Add color here
+  //       data: [
+  //         {
+  //           color: Highcharts.getOptions().colors![1],
+  //           radius: '79%',
+  //           innerRadius: '60%',
+  //           y: 65
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       name: 'Stand',
+  //       type: 'solidgauge',
+  //       showInLegend: true,
+  //       color: Highcharts.getOptions().colors![2],  // <-- Add color here
+  //       data: [
+  //         {
+  //           color: Highcharts.getOptions().colors![2],
+  //           radius: '59%',
+  //           innerRadius: '40%',
+  //           y: 50
+  //         }
+  //       ]
+  //     }
+  //   ];
+  //   this.updateFlag = true;
+  // }
+  
+}
