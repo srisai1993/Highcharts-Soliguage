@@ -2,14 +2,14 @@
     chart: {
       type: 'solidgauge',
       height: 400,
-      spacingTop: 60 // ✅ Add space manually to avoid collision with legend
+      // ✅ Add space manually to avoid collision with legend
     },
 
     title: {
-      text: null
+      text: null,
     },
     credits: {
-      enabled: false
+      enabled: false,
     },
     tooltip: {
       enabled: true,
@@ -17,7 +17,7 @@
       backgroundColor: 'none',
       shadow: false,
       style: {
-        fontSize: '16px'
+        fontSize: '16px',
       },
       valueSuffix: '%',
       pointFormat:
@@ -25,9 +25,9 @@
       positioner: function (labelWidth) {
         return {
           x: (this.chart.chartWidth - labelWidth) / 2 - 50,
-          y: this.chart.plotHeight * 0.5
+          y: this.chart.plotHeight * 0.5,
         };
-      }
+      },
     },
     legend: {
       enabled: true,
@@ -36,24 +36,24 @@
       verticalAlign: 'top', // ✅ Top position
       floating: false,
       itemStyle: {
-        fontSize: '11px',       // ✅ Smaller text
-        fontWeight: 'normal'
+        fontSize: '11px', // ✅ Smaller text
+        fontWeight: 'normal',
       },
       itemMarginTop: 2,
-      itemMarginBottom: 2
+      itemMarginBottom: 2,
     },
     pane: {
       startAngle: -90,
       endAngle: 90,
       center: ['50%', '65%'],
       size: '100%',
-      background: []
+      background: [],
     },
     yAxis: {
       min: 0,
       max: 100,
       lineWidth: 0,
-      tickPositions: []
+      tickPositions: [],
     },
     plotOptions: {
       solidgauge: {
@@ -62,11 +62,11 @@
           enabled: false,
           y: -30,
           borderWidth: 0,
-          useHTML: true
-        }
-      }
+          useHTML: true,
+        },
+      },
     },
-    series: []
+    series: [],
   };
 
   ngOnInit(): void {
@@ -75,11 +75,11 @@
 
   loadBidChartData(): void {
     const kpiData = [
-      { kpi: 'Move', value: 80, maxValue: 100 },
-      { kpi: 'Exercise Tracking', value: 65, maxValue: 100 },
-      { kpi: 'Stand Sessions', value: 50, maxValue: 100 },
-      { kpi: 'Focus Time', value: 40, maxValue: 100 },
-      { kpi: 'Energy Burn Level', value: 30, maxValue: 100 }
+      { kpi: 'Jiras worked on', value: 22, maxValue: 100 },
+      { kpi: 'Average Daily Commits', value: 14, maxValue: 85 },
+      { kpi: 'PRs Submitted', value: 7, maxValue: 12 },
+      { kpi: 'PRs Reviewed', value: 5, maxValue: 10 },
+      { kpi: 'Net Quality Issues Resolved', value: 52, maxValue: 52 },
     ];
 
     const arcThickness = 12;
@@ -90,8 +90,12 @@
     const background: any[] = [];
 
     kpiData.forEach((kpi, index) => {
-      const color = Highcharts.getOptions().colors![index % Highcharts.getOptions().colors!.length];
-      const outerRadius = startOuterRadius - index * (arcThickness + arcSpacing);
+      const color =
+        Highcharts.getOptions().colors![
+          index % Highcharts.getOptions().colors!.length
+        ];
+      const outerRadius =
+        startOuterRadius - index * (arcThickness + arcSpacing);
       const innerRadius = outerRadius - arcThickness;
 
       background.push({
@@ -99,7 +103,7 @@
         innerRadius: `${innerRadius}%`,
         shape: 'arc',
         backgroundColor: Highcharts.color(color).setOpacity(0.3).get(),
-        borderWidth: 0
+        borderWidth: 0,
       });
 
       series.push({
@@ -109,27 +113,26 @@
         color: color,
         data: [
           {
-            y: (kpi.value / kpi.maxValue) * 100,
+            y: kpi.value,
             radius: `${outerRadius}%`,
             innerRadius: `${innerRadius}%`,
-            color: color
-          }
+            color: color,
+          },
         ],
         dataLabels: {
           enabled: true,
-          format: '{y}%',
           borderWidth: 0,
           useHTML: false,
           style: {
             fontSize: '13px',
             fontWeight: 'bold',
             color: '#fff',
-            textOutline: 'none'
+            textOutline: 'none',
           },
           align: 'center',
           verticalAlign: 'middle',
-          y: -((outerRadius + innerRadius) / 2 - 50)
-        }
+          y: -((outerRadius + innerRadius) / 2 - 50),
+        },
       });
     });
 
